@@ -192,23 +192,37 @@ try:
         )
         CoalIndia = st.checkbox("COALINDIA.NS")
         if CoalIndia:
-            st.write("Predictions for CoalIndia")
+            st.write("Predictions for Coal India Limited")
 
             df, train, valid = lstm_model("COALINDIA.NS")
             plot_closing_price(df)
 
-        Stock2 = st.checkbox("Stock2")
-        if Stock2:
-            st.write("Predictions for Stock2")
+        BPCL = st.checkbox("BPCL.NS")
+        if BPCL:
+            st.write("Predictions for Bharat Petroleum Corporation Limited")
 
-            df, train, valid = lstm_model("Stock2")
+            df, train, valid = lstm_model("BPCL.NS")
             plot_closing_price(df)
 
-        Stock3 = st.checkbox("Stock3")
-        if Stock3:
-            st.write("Predictions for Stock3")
+        ITC = st.checkbox("ITC.NS")
+        if ITC:
+            st.write("Predictions for ITC Limited")
 
-            df, train, valid = lstm_model("Stock3")
+            df, train, valid = lstm_model("ITC.NS")
+            plot_closing_price(df)
+
+        AxisBank = st.checkbox("Axis Bank")
+        if AxisBank:
+            st.write("Predictions for Axis Bank Limited")
+
+            df, train, valid = lstm_model("AXISBANK.NS")
+            plot_closing_price(df)
+
+        GAIL = st.checkbox("GAIL.NS")
+        if GAIL:
+            st.write("Predictions for GAIL (India) Limited")
+
+            df, train, valid = lstm_model("GAIL.NS")
             plot_closing_price(df)
 
     elif nav == "Projection Accuracy":
@@ -226,21 +240,41 @@ try:
 
             st.write(valid)
 
-        Stock2 = st.checkbox("Stock2")
-        if Stock2:
-            st.write("Predictions for Stock2")
+        BPCL = st.checkbox("BPCL.NS")
+        if BPCL:
+            st.write("Predictions for Bharat Petroleum Corporation Limited")
 
-            df, train, valid = lstm_model("Stock2")
+            df, train, valid = lstm_model("BPCL.NS")
             plot_closing_price(df)
             plot_predictions(train, valid)
+            st.write(valid)
 
-        Stock3 = st.checkbox("Stock3")
-        if Stock3:
-            st.write("Predictions for Stock3")
+        ITC = st.checkbox("ITC.NS")
+        if ITC:
+            st.write("Predictions for ITC Limited")
 
-            df, train, valid = lstm_model("Stock3")
+            df, train, valid = lstm_model("ITC.NS")
             plot_closing_price(df)
             plot_predictions(train, valid)
+            st.write(valid)
+
+        AxisBank = st.checkbox("Axis Bank")
+        if AxisBank:
+            st.write("Predictions for Axis Bank Limited")
+
+            df, train, valid = lstm_model("AXISBANK.NS")
+            plot_closing_price(df)
+            plot_predictions(train, valid)
+            st.write(valid)
+
+        GAIL = st.checkbox("GAIL.NS")
+        if GAIL:
+            st.write("Predictions for GAIL (India) Limited")
+
+            df, train, valid = lstm_model("GAIL.NS")
+            plot_closing_price(df)
+            plot_predictions(train, valid)
+            st.write(valid)
 
     elif nav == "About us":
         st.header("About Us")
