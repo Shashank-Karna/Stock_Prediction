@@ -16,114 +16,6 @@ st.set_option("deprecation.showPyplotGlobalUse", False)
 warnings.filterwarnings("ignore")
 
 
-def lstm_model(stock_name):
-    df = web.DataReader(
-        stock_name, data_source="yahoo", start="2012-01-01", end="2022-04-18"
-    )
-
-    # Create a new dataframe with only close column
-    data = df.filter(["Close"])
-    dataset = data.values  # converting to numpy array
-    # get the no of rows to train the model on
-    training_data_len = math.ceil(len(dataset) * 0.8)
-    # training_data_len
-
-    # Scale the data
-    scaler = MinMaxScaler(feature_range=(0, 1))
-    scaled_data = scaler.fit_transform(dataset)
-
-    # scaled_data
-
-    # Create the training dataset
-    # Create the scaled training dataset
-
-    train_data = scaled_data[0:training_data_len, :]
-    # Split the data into X_train and Y_train data sets
-
-    x_train = []
-    y_train = []
-
-    for i in range(60, len(train_data)):
-        x_train.append(train_data[i - 60 : i, 0])
-        y_train.append(train_data[i, 0])
-    #     if i<= 60:
-    #         print(x_train)
-    #         print(y_train)
-    #         print()
-
-    # Convert the x_train and y_train to numpy arrays
-    x_train, y_train = np.array(x_train), np.array(y_train)
-    # x_train.shape
-
-    # Reshape the data
-    x_train = np.reshape(
-        x_train, (x_train.shape[0], x_train.shape[1], 1)
-    )  # (1345, 60, 1)
-    # x_train.shape
-
-    # Build the LSTM model
-
-    model = Sequential()
-    model.add(
-        LSTM(50, return_sequences=True, input_shape=(x_train.shape[1], 1))
-    )  # (60, 1)
-
-    model.add(
-        LSTM(
-            50,
-            return_sequences=False,
-        )
-    )
-    model.add(Dense(25))
-    model.add(Dense(1))
-
-    # Compile the model
-
-    model.compile(optimizer="adam", loss="mean_squared_error")
-
-    # train the model
-
-    model.fit(x_train, y_train, batch_size=1, epochs=1)
-
-    # Create the testing data set
-
-    # Create a new array containing scaled values from index 1345 to end
-
-    test_data = scaled_data[training_data_len - 60 :, :]
-
-    # create the datasets x_test and y_test
-
-    x_test = []
-    y_test = dataset[training_data_len:, :]  # this will contain the actual values
-
-    for i in range(60, len(test_data)):
-        x_test.append(test_data[i - 60 : i, 0])
-
-    # Convert the data to a numpy array
-    x_test = np.array(x_test)
-
-    # Reshape the datra
-    x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
-
-    # get the models predicted price values
-
-    predictions = model.predict(x_test)
-    predictions = scaler.inverse_transform(
-        predictions
-    )  # we want predictions to contain the same values as y_test dataset
-
-    # Get the root mean squared error(RMSE)
-    rmse = np.sqrt(np.mean(predictions - y_test) ** 2)
-    # rmse
-
-    # Plot the data
-    train = data[0:training_data_len]
-    valid = data[training_data_len:]
-    valid["Predictions"] = predictions
-
-    return df, train, valid
-
-
 def plan_generator(amount):
     st.write("The investment amount is:", amount)
 
@@ -194,35 +86,36 @@ try:
         if CoalIndia:
             st.write("Predictions for Coal India Limited")
 
-            df, train, valid = lstm_model("COALINDIA.NS")
+            df = pd.read_csv("COALINDIA\COALINDIA_df.csv")
+
             plot_closing_price(df)
 
         BPCL = st.checkbox("BPCL.NS")
         if BPCL:
             st.write("Predictions for Bharat Petroleum Corporation Limited")
 
-            df, train, valid = lstm_model("BPCL.NS")
+            df = pd.read_csv("BPCL/BPCL_df.csv")
             plot_closing_price(df)
 
         ITC = st.checkbox("ITC.NS")
         if ITC:
             st.write("Predictions for ITC Limited")
 
-            df, train, valid = lstm_model("ITC.NS")
+            df = pd.read_csv("ITC/ITC_df.csv")
             plot_closing_price(df)
 
         AxisBank = st.checkbox("Axis Bank")
         if AxisBank:
             st.write("Predictions for Axis Bank Limited")
 
-            df, train, valid = lstm_model("AXISBANK.NS")
+            df = pd.read_csv("AXISBANK/AXISBANK_df.csv")
             plot_closing_price(df)
 
         GAIL = st.checkbox("GAIL.NS")
         if GAIL:
             st.write("Predictions for GAIL (India) Limited")
 
-            df, train, valid = lstm_model("GAIL.NS")
+            df = pd.read_csv("GAIL/GAIL_df.csv")
             plot_closing_price(df)
 
     elif nav == "Projection Accuracy":
@@ -234,7 +127,10 @@ try:
         if CoalIndia:
             st.write("Predictions for CoalIndia")
 
-            df, train, valid = lstm_model("COALINDIA.NS")
+            df = pd.read_csv("COALINDIA\COALINDIA_df.csv")
+            train = pd.read_csv("COALINDIA\COALINDIA_train.csv")
+            valid = pd.read_csv("COALINDIA\COALINDIA_prediction.csv")
+
             plot_closing_price(df)
             plot_predictions(train, valid)
 
@@ -244,7 +140,10 @@ try:
         if BPCL:
             st.write("Predictions for Bharat Petroleum Corporation Limited")
 
-            df, train, valid = lstm_model("BPCL.NS")
+            df = pd.read_csv("BPCL/BPCL_df.csv")
+            train = pd.read_csv("BPCL/BPCL_train.csv")
+            valid = pd.read_csv("BPCL/BPCL_prediction.csv")
+
             plot_closing_price(df)
             plot_predictions(train, valid)
             st.write(valid)
@@ -253,7 +152,10 @@ try:
         if ITC:
             st.write("Predictions for ITC Limited")
 
-            df, train, valid = lstm_model("ITC.NS")
+            df = pd.read_csv("ITC/ITC_df.csv")
+            train = pd.read_csv("ITC/ITC_train.csv")
+            valid = pd.read_csv("ITC/ITC_prediction.csv")
+
             plot_closing_price(df)
             plot_predictions(train, valid)
             st.write(valid)
@@ -262,7 +164,10 @@ try:
         if AxisBank:
             st.write("Predictions for Axis Bank Limited")
 
-            df, train, valid = lstm_model("AXISBANK.NS")
+            df = pd.read_csv("AXISBANK/AXISBANK_df.csv")
+            train = pd.read_csv("AXISBANK/AXISBANK_train.csv")
+            valid = pd.read_csv("AXISBANK/AXISBANK_prediction.csv")
+
             plot_closing_price(df)
             plot_predictions(train, valid)
             st.write(valid)
@@ -271,7 +176,10 @@ try:
         if GAIL:
             st.write("Predictions for GAIL (India) Limited")
 
-            df, train, valid = lstm_model("GAIL.NS")
+            df = pd.read_csv("GAIL/GAIL_df.csv")
+            train = pd.read_csv("GAIL/GAIL_train.csv")
+            valid = pd.read_csv("GAIL/GAIL_prediction.csv")
+
             plot_closing_price(df)
             plot_predictions(train, valid)
             st.write(valid)
