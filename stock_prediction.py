@@ -59,14 +59,41 @@ nav = st.sidebar.radio(
 try:
 
     if nav == "Home":
-        st.header("Home")
+        st.title("INVESTMENT RECOMMENDATION SYSTEM")
 
-        st.write("INTRODUCTION AND SOME INFORMATION ABOUT STOCKS")
+        st.header("Invest today for a better tomorrow.")
+
+        st.write(
+            "A stock market is a platform for trading of a company’s stocks and derivatives at an agreed price. Supply and demand of shares drive the stock market. In any country the stock market is one of the most emerging sectors. Nowadays, many people are indirectly or directly related to this sector. Therefore, it becomes essential to know about market trends. Thus, with the development of the stock market, people are interested in forecasting stock prices."
+        )
 
         image = Image.open("test_stock.jpg")
-        st.image(image, caption="RANDOM STOCK IMAGE")
+        st.image(image, caption="")
 
-        st.write("SOME INFORMATION ABOUT THE PROJECT")
+        st.subheader("Our Objective")
+
+        st.write(
+            "Of India's 1.36 billion people, only about 3.7 per cent invest in the stock market. To spread financial literacy and make analysis easy for better investments."
+        )
+        st.write(
+            "Investment is a complex process, especially understanding the stock market, mutual funds, etc.So, the main objective is to bridge the awareness gap and let users plan and decide what stocks are best to invest their money."
+        )
+        st.write(
+            "Also, to analyze risk factors and help people invest their hard earned money better."
+        )
+
+        st.subheader("Machine Learning Model - LSTM")
+
+        st.write(
+            "Long Short Term Memory is a kind of recurrent neural network (RNN). LSTM can by default retain the information for a long period of time. It is used for processing, predicting, and classifying on the basis of time-series data."
+        )
+
+        st.write("Training is done under the following metrics and functions:")
+
+        st.write("""- Number of layers = 4 (two hidden layers)""")
+        st.write("""- Loss function = Root Mean Square Error""")
+        st.write("""- Optimizer = Adam""")
+        st.write("""- Epoch = 100""")
 
     elif nav == "Recommended Investment Plan":
         st.write("Here we ask user for amount and give the plan")

@@ -15,7 +15,7 @@ plt.style.use("fivethirtyeight")
 
 def lstm_model(stock_name):
     df = web.DataReader(
-        stock_name, data_source="yahoo", start="2012-01-01", end="2022-04-18"
+        stock_name, data_source="yahoo", start="2012-01-01", end="2022-05-01"
     )
 
     # Create a new dataframe with only close column
@@ -40,8 +40,8 @@ def lstm_model(stock_name):
     x_train = []
     y_train = []
 
-    for i in range(60, len(train_data)):
-        x_train.append(train_data[i - 60 : i, 0])
+    for i in range(30, len(train_data)):
+        x_train.append(train_data[i - 30 : i, 0])
         y_train.append(train_data[i, 0])
     #     if i<= 60:
     #         print(x_train)
@@ -80,21 +80,21 @@ def lstm_model(stock_name):
 
     # train the model
 
-    model.fit(x_train, y_train, batch_size=1, epochs=1)
+    model.fit(x_train, y_train, batch_size=64, epochs=100)
 
     # Create the testing data set
 
     # Create a new array containing scaled values from index 1345 to end
 
-    test_data = scaled_data[training_data_len - 60 :, :]
+    test_data = scaled_data[training_data_len - 30 :, :]
 
     # create the datasets x_test and y_test
 
     x_test = []
     y_test = dataset[training_data_len:, :]  # this will contain the actual values
 
-    for i in range(60, len(test_data)):
-        x_test.append(test_data[i - 60 : i, 0])
+    for i in range(30, len(test_data)):
+        x_test.append(test_data[i - 30 : i, 0])
 
     # Convert the data to a numpy array
     x_test = np.array(x_test)
