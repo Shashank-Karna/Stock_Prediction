@@ -13,122 +13,195 @@ pd.options.mode.chained_assignment = None
 plt.style.use("fivethirtyeight")
 
 
-def lstm_model(stock_name):
-    df = web.DataReader(
-        stock_name, data_source="yahoo", start="2012-01-01", end="2022-05-01"
+stock_name = "GAIL.NS"
+
+df = web.DataReader(
+    stock_name, data_source="yahoo", start="2012-01-01", end="2022-05-01"
+)
+
+# Create a new dataframe with only close column
+data = df.filter(["Close"])
+dataset = data.values  # converting to numpy array
+# get the no of rows to train the model on
+training_data_len = math.ceil(len(dataset) * 0.8)
+# training_data_len
+
+# Scale the data
+scaler = MinMaxScaler(feature_range=(0, 1))
+scaled_data = scaler.fit_transform(dataset)
+
+# scaled_data
+
+# Create the training dataset
+# Create the scaled training dataset
+
+train_data = scaled_data[0:training_data_len, :]
+# Split the data into X_train and Y_train data sets
+
+x_train = []
+y_train = []
+
+for i in range(60, len(train_data)):
+    x_train.append(train_data[i - 60 : i, 0])
+    y_train.append(train_data[i, 0])
+#     if i<= 60:
+#         print(x_train)
+#         print(y_train)
+#         print()
+
+# Convert the x_train and y_train to numpy arrays
+x_train, y_train = np.array(x_train), np.array(y_train)
+# x_train.shape
+
+# Reshape the data
+x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))  # (1345, 60, 1)
+# x_train.shape
+
+# Build the LSTM model
+
+model = Sequential()
+model.add(LSTM(50, return_sequences=True, input_shape=(x_train.shape[1], 1)))  # (60, 1)
+
+model.add(
+    LSTM(
+        50,
+        return_sequences=False,
     )
+)
+model.add(Dense(25))
+model.add(Dense(1))
 
-    # Create a new dataframe with only close column
-    data = df.filter(["Close"])
-    dataset = data.values  # converting to numpy array
-    # get the no of rows to train the model on
-    training_data_len = math.ceil(len(dataset) * 0.8)
-    # training_data_len
+# Compile the model
 
-    # Scale the data
-    scaler = MinMaxScaler(feature_range=(0, 1))
-    scaled_data = scaler.fit_transform(dataset)
+model.compile(optimizer="adam", loss="mean_squared_error")
 
-    # scaled_data
+# train the model
 
-    # Create the training dataset
-    # Create the scaled training dataset
+model.fit(x_train, y_train, batch_size=64, epochs=100)
 
-    train_data = scaled_data[0:training_data_len, :]
-    # Split the data into X_train and Y_train data sets
+# Create the testing data set
 
-    x_train = []
-    y_train = []
+# Create a new array containing scaled values from index 1345 to end
 
-    for i in range(30, len(train_data)):
-        x_train.append(train_data[i - 30 : i, 0])
-        y_train.append(train_data[i, 0])
-    #     if i<= 60:
-    #         print(x_train)
-    #         print(y_train)
-    #         print()
+test_data = scaled_data[training_data_len - 60 :, :]
 
-    # Convert the x_train and y_train to numpy arrays
-    x_train, y_train = np.array(x_train), np.array(y_train)
-    # x_train.shape
+# create the datasets x_test and y_test
 
-    # Reshape the data
-    x_train = np.reshape(
-        x_train, (x_train.shape[0], x_train.shape[1], 1)
-    )  # (1345, 60, 1)
-    # x_train.shape
+x_test = []
+y_test = dataset[training_data_len:, :]  # this will contain the actual values
 
-    # Build the LSTM model
+for i in range(60, len(test_data)):
+    x_test.append(test_data[i - 60 : i, 0])
 
-    model = Sequential()
-    model.add(
-        LSTM(50, return_sequences=True, input_shape=(x_train.shape[1], 1))
-    )  # (60, 1)
+# Convert the data to a numpy array
+x_test = np.array(x_test)
 
-    model.add(
-        LSTM(
-            50,
-            return_sequences=False,
-        )
-    )
-    model.add(Dense(25))
-    model.add(Dense(1))
+# Reshape the datra
+x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
 
-    # Compile the model
+# get the models predicted price values
 
-    model.compile(optimizer="adam", loss="mean_squared_error")
+predictions = model.predict(x_test)
+predictions = scaler.inverse_transform(predictions)
 
-    # train the model
+# we want predictions to contain the same values as y_test dataset
 
-    model.fit(x_train, y_train, batch_size=64, epochs=100)
+# Get the root mean squared error(RMSE)
+rmse = np.sqrt(np.mean(predictions - y_test) ** 2)
+# rmse
 
-    # Create the testing data set
+# Plot the data
+train = data[0:training_data_len]
+valid = data[training_data_len:]
+valid["Predictions"] = predictions
 
-    # Create a new array containing scaled values from index 1345 to end
+# Making data into neat dfs
+df["Date"] = df.index
+train["Date"] = df.Date[0:training_data_len]
+valid["Date"] = df.Date[training_data_len:]
 
-    test_data = scaled_data[training_data_len - 30 :, :]
+# Convert data to csv for exporting
+df.to_csv(r"" + stock_name[:-3] + "/" + stock_name[:-3] + "_df.csv", index=False)
+train.to_csv(r"" + stock_name[:-3] + "/" + stock_name[:-3] + "_train.csv", index=False)
+valid.to_csv(
+    r"" + stock_name[:-3] + "/" + stock_name[:-3] + "_prediction.csv", index=False
+)
 
-    # create the datasets x_test and y_test
+# try and predict closing price at may 02 2022
+quote = web.DataReader(
+    stock_name, data_source="yahoo", start="2012-01-01", end="2022-05-02"
+)
+# create new dataframe
 
-    x_test = []
-    y_test = dataset[training_data_len:, :]  # this will contain the actual values
+new_df = quote.filter(["Close"])
 
-    for i in range(30, len(test_data)):
-        x_test.append(test_data[i - 30 : i, 0])
+# get last 60day closing price values and convert the dataframe to an array
+last_60_days = new_df[-60:].values
 
-    # Convert the data to a numpy array
-    x_test = np.array(x_test)
+# scale the data
+last_60_days_scaled = scaler.transform(last_60_days)
 
-    # Reshape the datra
-    x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
+x_test1 = []
+x_test1.append(last_60_days_scaled)
 
-    # get the models predicted price values
+# convert x_test to numpy array
+x_test1 = np.array(x_test1)
 
-    predictions = model.predict(x_test)
-    predictions = scaler.inverse_transform(
-        predictions
-    )  # we want predictions to contain the same values as y_test dataset
+# reshape
+x_test1 = np.reshape(x_test1, (x_test1.shape[0], x_test1.shape[1], 1))
+# print(x_test)
 
-    # Get the root mean squared error(RMSE)
-    rmse = np.sqrt(np.mean(predictions - y_test) ** 2)
-    # rmse
+# print(x_test)
+# get the predicted scaled price
+pred_price = model.predict(x_test1)
 
-    # Plot the data
-    train = data[0:training_data_len]
-    valid = data[training_data_len:]
-    valid["Predictions"] = predictions
+# undo the scaling
+pred_price = scaler.inverse_transform(pred_price)
 
-    # Convert data to csv for exporting
-    df.to_csv(r"" + stock_name[:-3] + "/" + stock_name[:-3] + "_df.csv", index=False)
-    train.to_csv(
-        r"" + stock_name[:-3] + "/" + stock_name[:-3] + "_train.csv", index=False
-    )
-    valid.to_csv(
-        r"" + stock_name[:-3] + "/" + stock_name[:-3] + "_prediction.csv", index=False
-    )
+org_price = quote.Close[:-1]
 
-    return
+dataa = web.DataReader(
+    "DBREALTY.NS", data_source="yahoo", start="2012-01-01", end="2022-05-02"
+)
 
+close = dataa.filter(["Close"])
+last_60_days = close[-60:].values
+last_60_days_scaled = scaler.transform(last_60_days)
+x_input = []
+x_input.append(last_60_days_scaled)
+x_input = np.array(x_input)
+x_input = np.reshape(x_input, (x_input.shape[0], x_input.shape[1], 1))
 
-stock_name = input("Enter the name of the stock:\t")
-lstm_model(stock_name)
+temp_input = list(x_input)
+temp_input = temp_input[0].tolist()
+
+lst_output = []
+n_steps = 60
+i = 0
+while i < 30:
+
+    if len(temp_input) > 60:
+        x_input = np.array(temp_input[1:], dtype=object).astype("float32")
+        x_input = x_input.reshape(1, -1)
+        x_input = x_input.reshape((1, n_steps, 1))
+        yhat = model.predict(x_input, verbose=0)
+        #         print(x_input)
+        #         print(yhat)
+        temp_input.append(yhat[0].tolist())
+        temp_input = temp_input[1:]
+
+        # print(temp_input)
+
+        lst_output.append(yhat[0].tolist())
+        i = i + 1
+    else:
+        x_input = x_input.reshape((1, n_steps, 1))
+        yhat = model.predict(x_input, verbose=0)
+        #         print(x_input)
+        #         print(yhat)
+        temp_input.append(yhat[0].tolist())
+        lst_output.append(yhat[0].tolist())
+        i = i + 1
+
+plot_new = np.arange(1, 101)
+plot_pred = np.arange(101, 131)
