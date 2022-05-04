@@ -16,7 +16,7 @@ plt.style.use("fivethirtyeight")
 stock_name = "GAIL.NS"
 
 df = web.DataReader(
-    stock_name, data_source="yahoo", start="2012-01-01", end="2022-05-01"
+    stock_name, data_source="yahoo", start="2020-01-01", end="2022-05-01"
 )
 
 # Create a new dataframe with only close column
@@ -161,7 +161,7 @@ pred_price = scaler.inverse_transform(pred_price)
 org_price = quote.Close[:-1]
 
 dataa = web.DataReader(
-    "DBREALTY.NS", data_source="yahoo", start="2012-01-01", end="2022-05-02"
+    stock_name, data_source="yahoo", start="2012-01-01", end="2022-05-02"
 )
 
 close = dataa.filter(["Close"])
@@ -203,5 +203,26 @@ while i < 30:
         lst_output.append(yhat[0].tolist())
         i = i + 1
 
-plot_new = np.arange(1, 101)
-plot_pred = np.arange(101, 131)
+d1 = pd.DataFrame(scaler.inverse_transform(scaled_data[479:]))
+d2 = pd.DataFrame(scaler.inverse_transform(lst_output))
+
+print(len(scaled_data))
+
+l = []
+for i in range(100, 130):
+    l.append(i)
+
+d2["Numbers"] = l
+d2.set_index("Numbers")
+
+
+d1.to_csv(r"" + stock_name[:-3] + "/" + stock_name[:-3] + "_100.csv", index=False)
+d2.to_csv(r"" + stock_name[:-3] + "/" + stock_name[:-3] + "_30.csv", index=False)
+
+ds_new = scaled_data.tolist()
+ds_new.extend(lst_output)
+final_graph = pd.DataFrame(scaler.inverse_transform(ds_new))
+
+final_graph.to_csv(
+    r"" + stock_name[:-3] + "/" + stock_name[:-3] + "_final.csv", index=False
+)

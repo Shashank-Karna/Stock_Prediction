@@ -41,6 +41,35 @@ def plot_predictions(train, valid):
     st.pyplot()
 
 
+def plot_30(d1, d2):
+    st.write("Predictions for next 30 days")
+    plt.title("Close Price for next 30 days")
+    plt.ylabel("Close Price INR", fontsize=18)
+    plt.plot(d1)
+    plt.plot(d2["Numbers"], d2["0"])
+    # plt.legend(["Train", "Val", "Predictions"], loc="lower right")
+    st.pyplot()
+
+
+def plot_final(final_graph):
+    plt.figure(figsize=(16, 8))
+
+    plt.ylabel("Price")
+    plt.xlabel("Time")
+    plt.title("Close Price after 30 days")
+    plt.axhline(
+        y=final_graph[len(final_graph) - 1],
+        color="red",
+        linestyle=":",
+        label="NEXT 30D: {0}".format(
+            round(float(*final_graph[len(final_graph) - 1]), 2)
+        ),
+    )
+    plt.plot(final_graph)
+    plt.legend()
+    st.pyplot()
+
+
 nav = st.sidebar.radio(
     "Navigation",
     [
@@ -107,6 +136,18 @@ try:
 
         f = open(stock + "/" + "pred.txt", "r")
         lines = f.readlines()
+
+        st.markdown("**5th May 2022**")
+        st.text("    Predicted Price: " + lines[2])
+
+        d1 = pd.read_csv(stock + "/" + stock + "_100.csv")
+        d2 = pd.read_csv(stock + "/" + stock + "_30.csv")
+
+        plot_30(d1, d2)
+
+        final = pd.read_csv(stock + "/" + stock + "_final.csv")
+
+        plot_final(final)
 
     elif nav == "Close Price Prediciton for today":
         stock_list = ["GAIL", "BPCL", "ONGC", "CIPLA", "ITC"]
