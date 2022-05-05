@@ -13,7 +13,7 @@ pd.options.mode.chained_assignment = None
 plt.style.use("fivethirtyeight")
 
 
-stock_name = "GAIL.NS"
+stock_name = "CIPLA.NS"
 
 df = web.DataReader(
     stock_name, data_source="yahoo", start="2020-01-01", end="2022-05-01"

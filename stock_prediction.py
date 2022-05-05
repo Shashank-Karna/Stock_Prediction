@@ -44,6 +44,7 @@ def plot_predictions(train, valid):
 def plot_30(d1, d2):
     st.write("Predictions for next 30 days")
     plt.title("Close Price for next 30 days")
+    plt.xlabel("Time")
     plt.ylabel("Close Price INR", fontsize=18)
     plt.plot(d1)
     plt.plot(d2["Numbers"], d2["0"])
@@ -130,7 +131,7 @@ try:
         train = pd.read_csv(stock + "/" + stock + "_train.csv")
         valid = pd.read_csv(stock + "/" + stock + "_prediction.csv")
 
-        plot_predictions(train, valid)
+        plot_predictions(train, valid, stock)
 
         st.write(valid)
 
@@ -143,11 +144,11 @@ try:
         d1 = pd.read_csv(stock + "/" + stock + "_100.csv")
         d2 = pd.read_csv(stock + "/" + stock + "_30.csv")
 
-        plot_30(d1, d2)
+        plot_30(d1, d2, stock)
 
         final = pd.read_csv(stock + "/" + stock + "_final.csv")
 
-        plot_final(final)
+        plot_final(final, stock)
 
     elif nav == "Close Price Prediciton for today":
         stock_list = ["GAIL", "BPCL", "ONGC", "CIPLA", "ITC"]
